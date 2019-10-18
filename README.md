@@ -4,7 +4,7 @@
 
 ![](athena_ui.png)
 
-## Steps
+## Usage Steps
 
 1. Fill information into `config.js` and save it.
 ``` javascript
@@ -19,3 +19,9 @@ const config = {
 ```
 
 2. Open `athena_ui.html` and click `Get Athena Data` button.
+
+## Include
+
+- AWS-sdk
+- Bootstrap4
+- Datatables
