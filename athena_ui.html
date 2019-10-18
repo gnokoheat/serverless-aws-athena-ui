@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="utf-8">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Serverless Athena UI</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Roboto:100);
+
+        h1 {
+            font: 2em 'Roboto', sans-serif;
+            margin-bottom: 40px;
+        }
+
+        #loading {
+            color: rgb(0, 0, 0);
+            display: inline-block;
+            margin: auto;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            border-top-color: rgb(0, 0, 0);
+            animation: spin 1s ease-in-out infinite;
+            -webkit-animation: spin 1s ease-in-out infinite;
+        }
+
+        #loading_box {
+            text-align: center;
+            width: 100%;
+            height: 100vh;
+            padding: 100px;
+        }
+
+        @keyframes spin {
+            to {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @-webkit-keyframes spin {
+            to {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" style="padding: 5%; display: block;">
+        <div id="alert_popup"></div>
+        <div class="alert alert-success" role="alert">
+            <h4 class="alert-heading">Serverless Athena UI</h4>
+            <p>Easy Athena data view UI using AWS-SDK. It is neccesary that AWS information of
+                Region, S3 bucket, accessKey, secretKey, DB Name, Table Name.
+            </p>
+            <hr>
+            <div style="display: flow-root;">
+                <button type="button" class="btn btn-warning float-right" onclick="showAthenaData();">
+                    Get Athena Data
+                </button>
+                <button type="button" class="btn btn-primary float-right" style="margin-right: 10px;"
+                    data-toggle="modal" data-target="#awsInfoModal">
+                    AWS Information
+                </button>
+            </div>
+        </div>
+
+        <div class="card" style="margin:auto;">
+            <div class="card-header">
+                Athena Data
+            </div>
+            <div class="card-body">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Limit</span>
+                    </div>
+                    <input type="text" class="form-control" value="1000" id="limit">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Since</span>
+                    </div>
+                    <input type="text" class="form-control" value="" id="since" readonly>
+                </div>
+                <div class="overflow-auto">
+                    <div id="loading_box" style="display: none;">
+                        <div id="loading"></div>
+                    </div>
+                    <div id="athena_table">
+                        <table id="athena_data" class="table table-striped table-bordered">
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="awsInfoModal" tabindex="-1" role="dialog" aria-labelledby="awsInfoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="awsInfoModalLabel">AWS Information</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-1">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="
+                            min-width: 108px;">Region</span>
+                        </div>
+                        <input type="text" class="form-control" value="" id="aws_region">
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="
+                            min-width: 108px;">S3 bucket</span>
+                        </div>
+                        <input type="text" class="form-control" value="" id="aws_s3">
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="
+                            min-width: 108px;">DB Name</span>
+                        </div>
+                        <input type="text" class="form-control" value="" id="db_name">
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="
+                            min-width: 108px;">Table Name</span>
+                        </div>
+                        <input type="text" class="form-control" value="" id="table_name">
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="
+                            min-width: 108px;">accessKey</span>
+                        </div>
+                        <input type="text" class="form-control" value="" id="aws_key">
+                    </div>
+                    <div class="input-group mb-1">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" style="
+                            min-width: 108px;">secretKey</span>
+                        </div>
+                        <input type="text" class="form-control" value="" id="aws_secret">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="save_info">Save Information</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+    <script src="aws-sdk-2.551.0.min.js"></script>
+    <script src="common.js"></script>
+    <script src="config.js"></script>
+</body>
+
+</html>
