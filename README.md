@@ -1,4 +1,5 @@
 # serverless-aws-athena-ui
+![GitHub](https://img.shields.io/github/license/gnokoheat/serverless-aws-athena-ui) ![GitHub repo size](https://img.shields.io/github/repo-size/gnokoheat/serverless-aws-athena-ui) ![GitHub last commit](https://img.shields.io/github/last-commit/gnokoheat/serverless-aws-athena-ui)
 
 **Serverless AWS Athena UI - Simple & Easy query view of AWS Athena.**
 
